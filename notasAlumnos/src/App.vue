@@ -1,7 +1,14 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import {callWithAsyncErrorHandling, ref} from 'vue'
+import CalificaExamen from './components/calificacionExamen.vue'
+
 </script>
 
 <template>
-  <HelloWorld />
+
+  <h1>Calificación evaluaciones Inglés</h1>
+  <CalificaExamen />
+  <CalificaExamen />
+  <CalificaExamen />
+
 </template>
