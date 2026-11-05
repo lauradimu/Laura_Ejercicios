@@ -1,36 +1,71 @@
 <script setup>
 import { ref, computed } from 'vue';
 import CalificaExamen from './components/calificacionExamen.vue'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
-const nota1=ref(70); // ref() --> hace que la constante o variable sea reactiva y se inicialice con 70 por dejecto
-const nota2=ref(70);
-const nota3=ref(70);
+const evaluaciones = ref([
+  {nombre: 'Primera evaluación', notas: [70,70,70]}, // ref() --> hace que la constante o variable sea reactiva y se inicialice con 70 por dejecto
+  {nombre: 'Segunda evaluación', notas: [70,70,70]},
+  {nombre: 'Tercera evaluación', notas: [70,70,70]},
+])
 
-const notas = [nota1, nota2, nota3]
-
-function actualizarNota(valor, indice) {
-  notas[indice].value = valor
+function actualizarNota(valor, evalIndice, notaIndice) {
+  evaluaciones.value[evalIndice].notas[notaIndice] = valor
 }
 
-const mensaje = computed(() => {
+function media(notas){
+  const resultado = notas.reduce((total, n) => total + n, 0)
+  return resultado / 3
+}
 
-  const califica = nota1.value >= 50 && nota2.value >= 50 && nota3.value >= 50
-  if (califica){
+function mensaje(notas){
+  if (notas.every(n => n >= 50)) {
     return 'Aprobado'
-  }else{
+  } else {
     return 'Suspenso'
   }
-  });
+}
 </script>
 
 <template>
 
   <h1>Calificación evaluaciones Inglés</h1>
 
-  <CalificaExamen :nota="nota1" :indice="0" @actualizacionNota="actualizarNota"/>
-  <CalificaExamen :nota="nota2" :indice="1" @actualizacionNota="actualizarNota"/>
-  <CalificaExamen :nota="nota3" :indice="2" @actualizacionNota="actualizarNota"/>
-
-  {{ mensaje }}
+  <div class="cards">
+    <div class="card" v-for="(evaluacion, ei) in evaluaciones" :key="ei">
+      <div class="card-header">{{ evaluacion.nombre }}</div>
+      <div class="card-body">
+        <figure>
+          <blockquote class="blockquote">
+            <CalificaExamen
+              v-for="(nota,ni) in evaluacion.notas"
+              :key="ni"
+              :nota="nota"
+              @actualizacionNota="(valor) => actualizarNota(valor,ei,ni)"
+            />
+            <p v-if="evaluacion.notas.some(n => n > 100 || n < 0)">Error</p>
+            <template v-else>
+              <p>{{ mensaje(evaluacion.notas) }}</p>
+              <p>Media: {{ media(evaluacion.notas) }}</p>
+            </template>
+          </blockquote>
+        </figure>
+      </div>
+    </div>
+  </div>
 
 </template>
+
+<style scoped>
+    .cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .cards > * {
+      flex: 1 1 0;
+      max-width: 300px;
+    }
+  </style>
