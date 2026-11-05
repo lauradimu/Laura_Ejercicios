@@ -19,7 +19,7 @@ function media(notas){
 }
 
 function mensaje(notas){
-  if (notas.every(n => n >= 50)) {
+  if (media(notas) >= 50) {
     return 'Aprobado'
   } else {
     return 'Suspenso'
@@ -35,7 +35,7 @@ function mensaje(notas){
     <div class="card" v-for="(evaluacion, ei) in evaluaciones" :key="ei">
       <div class="card-header">{{ evaluacion.nombre }}</div>
       <div class="card-body">
-        <figure>
+        <!--<figure>-->
           <blockquote class="blockquote">
             <CalificaExamen
               v-for="(nota,ni) in evaluacion.notas"
@@ -43,13 +43,23 @@ function mensaje(notas){
               :nota="nota"
               @actualizacionNota="(valor) => actualizarNota(valor,ei,ni)"
             />
+            <div class="progress" aria-label="Basic example">
+              <div 
+                class="progress-bar" 
+                role="progressbar"
+                :style="{ width: media(evaluacion.notas) + '%' }"
+                :aria-valuenow="media(evaluacion.notas)"
+                aria-valuemin="0"
+                aria-valuemax="100">                
+              </div>
+            </div>
             <p v-if="evaluacion.notas.some(n => n > 100 || n < 0)">Error</p>
             <template v-else>
               <p>{{ mensaje(evaluacion.notas) }}</p>
               <p>Media: {{ media(evaluacion.notas) }}</p>
             </template>
           </blockquote>
-        </figure>
+        <!--</figure>-->
       </div>
     </div>
   </div>
