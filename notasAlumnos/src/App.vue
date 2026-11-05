@@ -13,13 +13,27 @@ function actualizarNota(valor, evalIndice, notaIndice) {
   evaluaciones.value[evalIndice].notas[notaIndice] = valor
 }
 
-function media(notas){
+function mediaEvaluacion(notas){
   const resultado = notas.reduce((total, n) => total + n, 0)
   return resultado / 3
 }
 
-function mensaje(notas){
-  if (media(notas) >= 50) {
+function mediaTotal(){
+  const resultado = evaluaciones.value.reduce((total, evaluacion) => 
+  total + mediaEvaluacion(evaluacion.notas), 0)
+  return resultado / 3
+}
+
+function mensajeEvaluacion(notas){
+  if (mediaEvaluacion(notas) >= 50) {
+    return 'Aprobado'
+  } else {
+    return 'Suspenso'
+  }
+}
+
+function mensajeTotal(notas){
+  if (mediaTotal(notas) >= 50) {
     return 'Aprobado'
   } else {
     return 'Suspenso'
@@ -29,7 +43,12 @@ function mensaje(notas){
 
 <template>
 
-  <h1>Calificación evaluaciones Inglés</h1>
+  <div class="position-relative d-flex justify-content-center align-items-center mb-3">
+    <h1 class="mb-0 text-center">Calificación evaluaciones Inglés</h1>
+    <div class="card position-absolute end-0 top-50 translate-middle-y">
+      <div class="card-body">{{ mensajeTotal() }} {{ mediaTotal() }}</div>
+    </div>
+  </div>
 
   <div class="cards">
     <div class="card" v-for="(evaluacion, ei) in evaluaciones" :key="ei">
@@ -47,23 +66,22 @@ function mensaje(notas){
               <div 
                 class="progress-bar" 
                 role="progressbar"
-                :style="{ width: media(evaluacion.notas) + '%' }"
-                :aria-valuenow="media(evaluacion.notas)"
+                :style="{ width: mediaEvaluacion(evaluacion.notas) + '%' }"
+                :aria-valuenow="mediaEvaluacion(evaluacion.notas)"
                 aria-valuemin="0"
                 aria-valuemax="100">                
               </div>
             </div>
             <p v-if="evaluacion.notas.some(n => n > 100 || n < 0)">Error</p>
             <template v-else>
-              <p>{{ mensaje(evaluacion.notas) }}</p>
-              <p>Media: {{ media(evaluacion.notas) }}</p>
+              <p>{{ mensajeEvaluacion(evaluacion.notas) }}</p>
+              <p>Media: {{ mediaEvaluacion(evaluacion.notas) }}</p>
             </template>
           </blockquote>
         <!--</figure>-->
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
