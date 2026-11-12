@@ -3,32 +3,45 @@ import { ref, computed } from 'vue';
 import CalificaExamen from './components/calificacionExamen.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
+const minMedias = [70, 60, 50];
+
 const evaluaciones = ref([
-  {nombre: 'Primera evaluación', notas: [70,70,70]}, // ref() --> hace que la constante o variable sea reactiva y se inicialice con 70 por dejecto
-  {nombre: 'Segunda evaluación', notas: [70,70,70]},
-  {nombre: 'Tercera evaluación', notas: [70,70,70]},
+  {nombre: 'Primera evaluación', notas: [50,50,50]}, // ref() --> hace que la constante o variable sea reactiva y se inicialice con 70 por dejecto
+  {nombre: 'Segunda evaluación', notas: [50,50,50]},
+  {nombre: 'Tercera evaluación', notas: [50,50,50]},
 ])
 
 function actualizarNota(valor, evalIndice, notaIndice) {
-  evaluaciones.value[evalIndice].notas[notaIndice] = valor
+  evaluaciones.value[evalIndice].notas[notaIndice] = valor;
 }
 
+function porcentajeAprobados(notas, minimo){
+  let cantidadAprobadas=0;
+    for(let i=0; i < notas.lenghth; i++){
+      if(notas[i] >= minMedias[minimo]){
+        cantidadAprobadas++;
+      }
+    } console.log(cantidadAprobadas);
+    console.log(minMedias[minimo]);
+    return Math.floor((1/cantidadAprobadas)*100)
+  }
+
 function mediaEvaluacion(notas){
-  const resultado = notas.reduce((total, n) => total + n, 0)
-  return resultado / 3
+  const resultado = notas.reduce((total, n) => total + n, 0);
+  return resultado / 3;
 }
 
 function mediaTotal(){
   const resultado = evaluaciones.value.reduce((total, evaluacion) => 
-  total + mediaEvaluacion(evaluacion.notas), 0)
-  return resultado / 3
+  total + mediaEvaluacion(evaluacion.notas), 0);
+  return resultado / 3;
 }
 
-function mensajeEvaluacion(notas){
-  if (mediaEvaluacion(notas) >= 50) {
-    return 'Aprobado'
+function mensajeEvaluacion(notas, minimo){
+  if (mediaEvaluacion(notas) >= minimo) {
+    return 'Aprobado';
   } else {
-    return 'Suspenso'
+    return 'Suspenso';
   }
 }
 
@@ -38,7 +51,9 @@ function mensajeTotal(notas){
   } else {
     return 'Suspenso'
   }
+
 }
+
 </script>
 
 <template>
@@ -46,7 +61,7 @@ function mensajeTotal(notas){
   <div class="position-relative d-flex justify-content-center align-items-center mb-3">
     <h1 class="mb-0 text-center">Calificación evaluaciones Inglés</h1>
     <div class="card position-absolute end-0 top-50 translate-middle-y">
-      <div class="card-body">{{ mensajeTotal() }} {{ mediaTotal() }}</div>
+      <div class="card-body">{{ mensajeTotal() }} {{ mediaTotal().toFixed(2) }}</div>
     </div>
   </div>
 
@@ -66,16 +81,16 @@ function mensajeTotal(notas){
               <div 
                 class="progress-bar" 
                 role="progressbar"
-                :style="{ width: mediaEvaluacion(evaluacion.notas) + '%' }"
-                :aria-valuenow="mediaEvaluacion(evaluacion.notas)"
+                :style="{ width: porcentajeAprobados(evaluacion.notas, minMedias[ei]) + '%' }"
+                :aria-valuenow="porcentajeAprobados(evaluacion.notas, minMedias[ei] )"
                 aria-valuemin="0"
                 aria-valuemax="100">                
               </div>
             </div>
             <p v-if="evaluacion.notas.some(n => n > 100 || n < 0)">Error</p>
             <template v-else>
-              <p>{{ mensajeEvaluacion(evaluacion.notas) }}</p>
-              <p>Media: {{ mediaEvaluacion(evaluacion.notas) }}</p>
+              <p>{{ mensajeEvaluacion(evaluacion.notas, minMedias[ei]) }}</p>
+              <p>Media: {{ mediaEvaluacion(evaluacion.notas).toFixed(2) }}</p>
             </template>
           </blockquote>
         <!--</figure>-->
